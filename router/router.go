@@ -9,9 +9,7 @@ import (
 	"go_simple_crud/dbutil"
 	"go_simple_crud/models"
 	logger "go_simple_crud/pkg"
-	"log"
 	"net/http"
-	"time"
 )
 
 func Router() *gin.Engine{
@@ -31,44 +29,6 @@ func Router() *gin.Engine{
 	r.GET("/test", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "Hello World!")
 	})
-
-	r.POST("/test/insert_simple", func(c *gin.Context) {
-
-		db, err := dbutil.ConnectDB("mongodb://192.168.80.129:27017", "go_simple_crud", "root", "toor")
-		//db, err := dbutil.ConnectDB("mongodb://192.168.200.10:27017", "go_simple_crud", "root", "toor")
-
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-
-		//fmt.Println(time.Now().Unix())  // debug
-
-		// 获取或创建集合
-		collection := db.Collection("user")
-
-		newUser := models.User{
-			// 初始化文档数据
-			Username: "admin",
-			Email:    "admin@admin.com",
-			Password: "PenTest123",
-			Roles:    []string{"admin"}, // or []string{"user","admin},
-			//CreatedAt: time.Now(),
-			//UpdatedAt: time.Now(),
-			CreatedAt: time.Now().Unix(),
-			UpdatedAt: time.Now().Unix(),
-		}
-
-		result, err := dbutil.InsertOne(collection, newUser)
-
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(200, gin.H{"message": "Document inserted", "insertedID": result.InsertedID})
-	})
-
 	r.GET("/test/find", func(c *gin.Context) {
 
 		//db, err := dbutil.ConnectDB("mongodb://192.168.80.129:27017", "go_simple_crud", "root", "toor")
@@ -78,7 +38,7 @@ func Router() *gin.Engine{
 		//	log.Fatal(err)
 		//	return
 		//}
-        // global need set in init()
+		// global need set in init()
 		collection := dbutil.DBEngine.Collection("user")
 
 		//id := c.Param("id")  // "/find/:id"
@@ -103,6 +63,45 @@ func Router() *gin.Engine{
 		c.JSON(200, foundUser)
 	})
 
+	//r.POST("/test/insert_simple", func(c *gin.Context) {
+	//
+	//	db, err := dbutil.ConnectDB("mongodb://192.168.80.129:27017", "go_simple_crud", "root", "toor")
+	//	//db, err := dbutil.ConnectDB("mongodb://192.168.200.10:27017", "go_simple_crud", "root", "toor")
+	//
+	//	if err != nil {
+	//		log.Fatal(err)
+	//		return
+	//	}
+	//
+	//	//fmt.Println(time.Now().Unix())  // debug
+	//
+	//	// 获取或创建集合
+	//	collection := db.Collection("user")
+	//
+	//	newUser := models.User{
+	//		// 初始化文档数据
+	//		Username: "admin",
+	//		Email:    "admin@admin.com",
+	//		Password: "PenTest123",
+	//		Roles:    []string{"admin"}, // or []string{"user","admin},
+	//		//CreatedAt: time.Now(),
+	//		//UpdatedAt: time.Now(),
+	//		CreatedAt: time.Now().Unix(),
+	//		UpdatedAt: time.Now().Unix(),
+	//	}
+	//
+	//	result, err := dbutil.InsertOne(collection, newUser)
+	//
+	//	if err != nil {
+	//		c.JSON(500, gin.H{"error": err.Error()})
+	//		return
+	//	}
+	//
+	//	c.JSON(200, gin.H{"message": "Document inserted", "insertedID": result.InsertedID})
+	//})
+
+
+
 
     // user router
 	userRouter := r.Group("/user")
@@ -114,6 +113,12 @@ func Router() *gin.Engine{
 		// 路径传参 name
 		//user.GET("/info/:name", controllers.UserController{}.GetUserInfo)
 
+	}
+
+	// task router
+	taskRouter := r.Group("/task")
+	{
+		taskRouter.POST("/add", controllers.TaskController{}.Add)
 	}
 
 	return r

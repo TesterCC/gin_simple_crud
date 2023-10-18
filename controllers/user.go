@@ -87,15 +87,34 @@ func (u UserController) Register(c *gin.Context) {
 
 }
 
-//user, err := models.GetUserInfoByUsername(username)
-//if user.ID != 0 {
-//	ReturnError(c, 40003, "用户名已存在")
-//	return
-//}
-//_, err = models.AddUser(username, EncryptMd5(password))
-//if err != nil {
-//	ReturnError(c, 40004, "注册失败，请重试")
-//	return
-//}
 
-//ReturnSuccess(c, 0, "success", "")
+// todo
+
+func (u UserController) Login(c *gin.Context) {
+	// login info
+
+	////获取参数信息
+	//username := c.DefaultPostForm("username", "")
+	//password := c.DefaultPostForm("password", "")
+	//if username == "" || password == "" {
+	//	ReturnError(c, 4001, "请输入正确的信息")
+	//	return
+	//}
+	//
+	//user, _ := models.GetUserInfoByUsername(username)
+	//if user.Id == 0 || user.Password != EncryptMd5(password) {
+	//	ReturnError(c, 4001, "用户名或密码不正确")
+	//	return
+	//}
+	//// 通过密码校验后把信息保存到session中，有三方包
+	//// 如果直接返回User结构体，会把User所有字段（含密码）一起返回出去，这样不安全。所以另外定义一个结构体UserApi做返回
+	//data := UserApi{Id: user.Id, Username: user.Username}
+	//
+	//session := sessions.Default(c)
+	//session.Set("login:"+strconv.Itoa(user.Id), user.Id)
+	//session.Save()
+	//
+	//ReturnSuccess(c, 1, "login success", data, 1)
+}
+
+
