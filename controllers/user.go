@@ -106,7 +106,7 @@ func (u UserController) Login(c *gin.Context) {
 	filter := bson.M{"username": username}
 
 	queryUser := models.User{}
-
+    // 为了使 FindOne 函数能够正确地填充查询结果，需要传递结构体的指针，即 &result。这样函数将能够修改结构体的内容并将查询结果填充到结构体中。
 	err := dbutil.FindOne(userCol, filter, &queryUser)
 
 	if err != nil {
