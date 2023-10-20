@@ -3,18 +3,12 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go_simple_crud/dbutil"
 	"go_simple_crud/models"
 	"log"
 	"net/http"
 	"time"
 )
-
-type UserApi struct {
-	ID       primitive.ObjectID `json:"id"`
-	Username string             `json:"username"`
-}
 
 // 让每一个controller下面能定义同名函数，使用结构体
 
@@ -87,34 +81,46 @@ func (u UserController) Register(c *gin.Context) {
 
 }
 
-
-// todo
-
 func (u UserController) Login(c *gin.Context) {
-	// login info
+	// get login info
 
-	////获取参数信息
-	//username := c.DefaultPostForm("username", "")
-	//password := c.DefaultPostForm("password", "")
-	//if username == "" || password == "" {
-	//	ReturnError(c, 4001, "请输入正确的信息")
-	//	return
-	//}
-	//
-	//user, _ := models.GetUserInfoByUsername(username)
-	//if user.Id == 0 || user.Password != EncryptMd5(password) {
-	//	ReturnError(c, 4001, "用户名或密码不正确")
-	//	return
-	//}
-	//// 通过密码校验后把信息保存到session中，有三方包
-	//// 如果直接返回User结构体，会把User所有字段（含密码）一起返回出去，这样不安全。所以另外定义一个结构体UserApi做返回
-	//data := UserApi{Id: user.Id, Username: user.Username}
-	//
-	//session := sessions.Default(c)
-	//session.Set("login:"+strconv.Itoa(user.Id), user.Id)
-	//session.Save()
-	//
-	//ReturnSuccess(c, 1, "login success", data, 1)
+	var user models.User
+
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// get info from json
+	username := user.Username
+	password := user.Password
+
+	if username == "" || password == "" {
+		ReturnError(c, 40001, "username or password is empty")
+		return
+	}
+
+	//fmt.Println("[Debug] user: ", user)
+
+	userCol := dbutil.DBEngine.Collection("user")
+	filter := bson.M{"username": username}
+
+	queryUser := models.User{}
+
+	err := dbutil.FindOne(userCol, filter, &queryUser)
+
+	if err != nil {
+		// 处理错误
+		ReturnError(c, http.StatusInternalServerError, err.Error())
+		log.Fatal(err)
+	}
+
+	if username != queryUser.Username || EncryptMd5(password) != queryUser.Password {
+		ReturnError(c, 40003, "username or password is invalid")
+		return
+	}
+
+	data := models.UserApi{ID: queryUser.ID, Username: queryUser.Username}
+	//fmt.Println("[DDD] ", queryUser)
+	ReturnSuccess(c, http.StatusOK, "request success", data)
 }
-
-

@@ -16,3 +16,8 @@ type User struct {
 	CreatedAt int64 `bson:"created_at" json:"created_at"`
 	UpdatedAt int64 `bson:"updated_at" json:"updated_at"`
 }
+
+type UserApi struct {
+	ID       primitive.ObjectID `json:"id"`
+	Username string             `json:"username"`
+}

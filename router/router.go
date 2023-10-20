@@ -108,7 +108,7 @@ func Router() *gin.Engine{
 	// router use controllers   // 大项目推荐用下面这种方式,以防方法名冲突
 	{
 		userRouter.POST("/register", controllers.UserController{}.Register)
-		//user.POST("/login", controllers.UserController{}.Login)
+		userRouter.POST("/login", controllers.UserController{}.Login)
 
 		// 路径传参 name
 		//user.GET("/info/:name", controllers.UserController{}.GetUserInfo)
