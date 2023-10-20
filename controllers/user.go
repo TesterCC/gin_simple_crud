@@ -54,8 +54,8 @@ func (u UserController) Register(c *gin.Context) {
 	count, err := dbutil.CountDocuments(collection, filter)
 	if err != nil {
 		// 处理错误
-		log.Fatal(err)
 		ReturnError(c, http.StatusInternalServerError, err.Error())
+		log.Fatal(err)
 	}
 
 	if count > 0 {
