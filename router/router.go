@@ -119,6 +119,7 @@ func Router() *gin.Engine{
 	taskRouter := r.Group("/task")
 	{
 		taskRouter.POST("/add", controllers.TaskController{}.Add)
+		taskRouter.POST("/addCmdTask", controllers.TaskController{}.AddCmdTask)
 	}
 
 	return r

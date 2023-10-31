@@ -121,6 +121,7 @@ func (u UserController) Login(c *gin.Context) {
 	}
 
 	data := models.UserApi{ID: queryUser.ID, Username: queryUser.Username}
+	// todo in real online logic, here need to update session or create jwt token ...
 	//fmt.Println("[DDD] ", queryUser)
 	ReturnSuccess(c, http.StatusOK, "request success", data)
 }

@@ -40,7 +40,6 @@ func (t TaskController) Add(c *gin.Context) {
 		return
 	}
 
-
 	filter := bson.M{"name": taskName}
 
 	collection := dbutil.DBEngine.Collection("task")
@@ -56,15 +55,75 @@ func (t TaskController) Add(c *gin.Context) {
 		ReturnError(c, 10021, "task name is exist")
 	} else {
 		// add task info
-		newTask := &models.Task {
-			Name: taskName,
-			Command: taskCmd,
-			Status: 0,
-			Type: taskType,
+		newTask := &models.Task{
+			Name:      taskName,
+			Command:   taskCmd,
+			Status:    0,
+			Type:      taskType,
 			CreatedBy: "admin",
 			CreatedAt: time.Now().Unix(),
 		}
 
+		result, err := dbutil.InsertOne(collection, newTask)
+
+		if err != nil {
+			ReturnError(c, http.StatusInternalServerError, err.Error())
+			//c.JSON(500, gin.H{"error": err.Error()})
+			//return
+		}
+
+		ReturnSuccess(c, http.StatusOK, "request success", gin.H{"insertedID": result.InsertedID})
+
+	}
+}
+
+func (t TaskController) AddCmdTask(c *gin.Context) {
+	var task models.CmdTask
+
+	if err := c.BindJSON(&task); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	taskID := task.TaskID
+	nodeID := task.NodeID
+	ctype := task.CType
+	remark := task.Remark
+
+	//fmt.Println("[D]", taskName)
+	//fmt.Println("[D]", taskType)
+
+	fmt.Printf("[D] task_id: %s , node_id: %s , ctype: %d \n", taskID, nodeID, ctype)
+
+	if ctype < 0x00 || ctype > 0x40 {
+		ReturnError(c, 40002, "task ctype invalid")
+		return
+	}
+
+	filter := bson.M{"task_id": taskID}
+
+	collection := dbutil.DBEngine.Collection("cmd_task")
+
+	count, err := dbutil.CountDocuments(collection, filter)
+	if err != nil {
+		// 处理错误
+		ReturnError(c, http.StatusInternalServerError, err.Error())
+		log.Fatal(err)
+	}
+
+	if count > 0 {
+		ReturnError(c, 10021, "task name is exist")
+	} else {
+		// add task info
+		newTask := &models.CmdTask{
+			TaskID:     taskID,
+			NodeID:     nodeID,
+			Creator:    "admin",
+			CreateTime: time.Now().Unix(),
+			TaskStatus: 0,
+			CType:      0x39,
+			Remark:     remark,
+		}
 		result, err := dbutil.InsertOne(collection, newTask)
 
 		if err != nil {
