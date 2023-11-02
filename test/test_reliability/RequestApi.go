@@ -7,6 +7,7 @@ import (
 	"go_simple_crud/test/test_reliability/RootMsg"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
@@ -17,8 +18,9 @@ func getTaskID() int {
 	return testUniqueID
 }
 
-func executeCmd(cmd string, ctype int) (interface{}, error) {
-	var retData interface{}
+func executeCmd(cmd string, ctype int) (map[string]interface{}, error) {
+	//var retData interface{}
+	var retData map[string]interface{}
 	if ctype == RootMsg.STAT_ONLINE || ctype == RootMsg.CYCLE {
 		taskID := getTaskID()
 		//cmd = strings.TrimSpace(cmdStr) + fmt.Sprintf("--id=%d", taskID)  // need debug
@@ -47,6 +49,8 @@ func executeCmd(cmd string, ctype int) (interface{}, error) {
 		}
 
 		if len(respBody) > 0 {
+
+			fmt.Println("[D] response body: ")
 			fmt.Println(string(respBody))
 
 			//用于将 JSON 数据解析为 Go 语言中的结构体或其他数据类型
@@ -70,6 +74,14 @@ func executeCmd(cmd string, ctype int) (interface{}, error) {
 func main() {
 	cmdRaw := "topo"
 	cmdStr := base64.StdEncoding.EncodeToString([]byte(cmdRaw))
-	fmt.Println(cmdStr)
-	executeCmd(cmdStr, 0x49)
+	fmt.Printf("[D] plaintext cmd: %s \n", cmdRaw)
+	data, _ := executeCmd(cmdStr, 0x49)
+	fmt.Println(reflect.TypeOf(data))  // debug, print type
+	fmt.Println("[D] response data: ", data)
+
+
+	for k, v := range data {
+		fmt.Printf("%s: %v\n", k, v)
+	}
+
 }
