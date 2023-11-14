@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -53,7 +54,7 @@ func Router() *gin.Engine{
 		//fmt.Println("[D]", filter)
 
 		var foundUser models.User
-		err = dbutil.FindOne(collection, filter, &foundUser)
+		err = dbutil.FindOne(context.Background(), collection, filter, &foundUser)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return

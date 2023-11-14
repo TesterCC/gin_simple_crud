@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go_simple_crud/dbutil"
@@ -45,7 +46,7 @@ func (u UserController) Register(c *gin.Context) {
 
 	collection := dbutil.DBEngine.Collection("user")
 
-	count, err := dbutil.CountDocuments(collection, filter)
+	count, err := dbutil.CountDocuments(context.Background(),collection, filter)
 	if err != nil {
 		// 处理错误
 		ReturnError(c, http.StatusInternalServerError, err.Error())
@@ -68,7 +69,7 @@ func (u UserController) Register(c *gin.Context) {
 			UpdatedAt: time.Now().Unix(),
 		}
 
-		result, err := dbutil.InsertOne(collection, newUser)
+		result, err := dbutil.InsertOne(context.Background(), collection, newUser)
 
 		if err != nil {
 			ReturnError(c, http.StatusInternalServerError, err.Error())
@@ -107,7 +108,7 @@ func (u UserController) Login(c *gin.Context) {
 
 	queryUser := models.User{}
     // 为了使 FindOne 函数能够正确地填充查询结果，需要传递结构体的指针，即 &result。这样函数将能够修改结构体的内容并将查询结果填充到结构体中。
-	err := dbutil.FindOne(userCol, filter, &queryUser)
+	err := dbutil.FindOne(context.Background(), userCol, filter, &queryUser)
 
 	if err != nil {
 		// 处理错误

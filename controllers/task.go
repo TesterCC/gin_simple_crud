@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -44,7 +45,7 @@ func (t TaskController) Add(c *gin.Context) {
 
 	collection := dbutil.DBEngine.Collection("task")
 
-	count, err := dbutil.CountDocuments(collection, filter)
+	count, err := dbutil.CountDocuments(context.Background(), collection, filter)
 	if err != nil {
 		// 处理错误
 		ReturnError(c, http.StatusInternalServerError, err.Error())
@@ -64,7 +65,7 @@ func (t TaskController) Add(c *gin.Context) {
 			CreatedAt: time.Now().Unix(),
 		}
 
-		result, err := dbutil.InsertOne(collection, newTask)
+		result, err := dbutil.InsertOne(context.Background(), collection, newTask)
 
 		if err != nil {
 			ReturnError(c, http.StatusInternalServerError, err.Error())
@@ -104,7 +105,7 @@ func (t TaskController) AddCmdTask(c *gin.Context) {
 
 	collection := dbutil.DBEngine.Collection("cmd_task")
 
-	count, err := dbutil.CountDocuments(collection, filter)
+	count, err := dbutil.CountDocuments(context.Background(), collection, filter)
 	if err != nil {
 		// 处理错误
 		ReturnError(c, http.StatusInternalServerError, err.Error())
@@ -124,7 +125,7 @@ func (t TaskController) AddCmdTask(c *gin.Context) {
 			CType:      0x39,
 			Remark:     remark,
 		}
-		result, err := dbutil.InsertOne(collection, newTask)
+		result, err := dbutil.InsertOne(context.Background(), collection, newTask)
 
 		if err != nil {
 			ReturnError(c, http.StatusInternalServerError, err.Error())
